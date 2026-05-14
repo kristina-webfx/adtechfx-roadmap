@@ -57,11 +57,12 @@ def fetch_issues():
             "jql":        jql,
             "startAt":    start_at,
             "maxResults": page_size,
+            "fieldsByKeys": False,
             "fields":     FIELDS,
         }).encode()
 
         req = urllib.request.Request(
-            f"{JIRA_BASE}/rest/api/3/search",
+            f"{JIRA_BASE}/rest/api/3/search/jql",
             data=payload,
             headers=_auth_header(),
             method="POST",
