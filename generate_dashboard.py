@@ -1,0 +1,687 @@
+#!/usr/bin/env python3
+"""
+AdTechFX Dashboard Generator
+Fetches all non-done/non-declined MCPP issues labelled "AdTechFX" from Jira
+and produces a static index.html for GitHub Pages.
+"""
+
+import base64
+import json
+import os
+import sys
+from datetime import datetime, timezone
+import urllib.request
+import urllib.error
+
+# ── Config ────────────────────────────────────────────────────────────────────
+JIRA_BASE      = "https://webfx.atlassian.net"
+JIRA_EMAIL     = os.environ["JIRA_EMAIL"]
+JIRA_API_TOKEN = os.environ["JIRA_API_TOKEN"]
+PROJECT        = "MCPP"
+LABEL          = "AdTechFX"
+
+# Statuses to EXCLUDE (case-insensitive match)
+EXCLUDED_STATUSES = {"done", "declined"}
+
+# Fields to fetch from Jira
+FIELDS = [
+    "summary", "status", "assignee", "priority",
+    "issuetype", "created", "updated", "labels",
+    "customfield_10014",   # Epic Link (classic)
+    "customfield_10020",   # Sprint
+    "parent",
+]
+
+# ── Auth header ───────────────────────────────────────────────────────────────
+def _auth_header():
+    token = base64.b64encode(f"{JIRA_EMAIL}:{JIRA_API_TOKEN}".encode()).decode()
+    return {"Authorization": f"Basic {token}", "Content-Type": "application/json"}
+
+
+# ── Jira fetch ────────────────────────────────────────────────────────────────
+def fetch_issues():
+    jql = (
+        f'project = {PROJECT} '
+        f'AND labels = "{LABEL}" '
+        f'AND statusCategory != Done '
+        f'AND status != Declined '
+        f'ORDER BY created DESC'
+    )
+
+    issues = []
+    start_at = 0
+    page_size = 100
+
+    while True:
+        payload = json.dumps({
+            "jql":        jql,
+            "startAt":    start_at,
+            "maxResults": page_size,
+            "fields":     FIELDS,
+        }).encode()
+
+        req = urllib.request.Request(
+            f"{JIRA_BASE}/rest/api/3/search/jql",
+            data=payload,
+            headers=_auth_header(),
+            method="POST",
+        )
+
+        try:
+            with urllib.request.urlopen(req) as resp:
+                data = json.loads(resp.read())
+        except urllib.error.HTTPError as e:
+            print(f"Jira API error {e.code}: {e.read().decode()}", file=sys.stderr)
+            sys.exit(1)
+
+        issues.extend(data.get("issues", []))
+        total = data.get("total", 0)
+        start_at += page_size
+        if start_at >= total:
+            break
+
+    return issues
+
+
+# ── Shape issues for the frontend ─────────────────────────────────────────────
+def shape(issues):
+    shaped = []
+    for issue in issues:
+        f = issue.get("fields", {})
+
+        # assignee
+        assignee = None
+        if f.get("assignee"):
+            assignee = f["assignee"].get("displayName")
+
+        # epic name — try parent summary if it's an Epic, else epic link field
+        epic = None
+        parent = f.get("parent")
+        if parent:
+            parent_type = (parent.get("fields") or {}).get("issuetype", {}).get("name", "")
+            if parent_type == "Epic":
+                epic = (parent.get("fields") or {}).get("summary")
+            else:
+                epic = parent.get("fields", {}).get("summary")
+
+        # sprint name
+        sprint = None
+        sprints = f.get("customfield_10020") or []
+        if sprints:
+            active = [s for s in sprints if s.get("state") == "active"]
+            sprint_obj = active[0] if active else sprints[-1]
+            sprint = sprint_obj.get("name")
+
+        # created ISO → date string
+        created_raw = f.get("created", "")
+        created_display = created_raw[:10] if created_raw else ""
+
+        shaped.append({
+            "key":      issue["key"],
+            "url":      f"{JIRA_BASE}/browse/{issue['key']}",
+            "summary":  f.get("summary", ""),
+            "status":   f.get("status", {}).get("name", ""),
+            "assignee": assignee or "Unassigned",
+            "priority": f.get("priority", {}).get("name", ""),
+            "type":     f.get("issuetype", {}).get("name", ""),
+            "epic":     epic or "",
+            "sprint":   sprint or "",
+            "created":  created_raw,
+            "created_display": created_display,
+            "labels":   f.get("labels", []),
+        })
+
+    return shaped
+
+
+# ── Read priorities from a sidecar file (priorities.json) ────────────────────
+def load_priorities():
+    path = os.path.join(os.path.dirname(__file__), "priorities.json")
+    if os.path.exists(path):
+        with open(path) as fh:
+            return json.load(fh)
+    return []
+
+
+# ── HTML generation ───────────────────────────────────────────────────────────
+HTML_TEMPLATE = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AdTechFX Dashboard · MCPP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap">
+<style>
+  /* ── Reset & base ─────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0E1623;
+    --surface:   #142034;
+    --card:      #1C2C48;
+    --border:    #263A5F;
+    --blue:      #207DE9;
+    --blue-light:#84B9F5;
+    --blue-pale: #CCE4FF;
+    --text:      #F2F2F2;
+    --muted:     #829DCE;
+    --green:     #41D48C;
+    --red:       #F04D50;
+    --yellow:    #FFD12D;
+    --orange:    #F7941D;
+    --teal:      #4DC1B9;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── Header ───────────────────────────────────────────────────── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  header .brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  header img.logo {
+    height: 32px;
+    display: block;
+  }
+  header .divider {
+    width: 1px;
+    height: 32px;
+    background: var(--border);
+  }
+  header h1 {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+  header h1 span { color: var(--blue); }
+  .last-updated {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  /* ── Layout ───────────────────────────────────────────────────── */
+  main { padding: 32px; max-width: 1400px; margin: 0 auto; }
+
+  /* ── Stat cards ───────────────────────────────────────────────── */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+  .stat-card .num {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--blue-light);
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-card .label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Section heads ────────────────────────────────────────────── */
+  .section-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .section-head h2 {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+  .section-head .pill {
+    background: var(--blue);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 9999px;
+  }
+
+  /* ── Priorities ───────────────────────────────────────────────── */
+  .priorities-section { margin-bottom: 40px; }
+  .priority-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .priority-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--blue);
+    border-radius: 8px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .priority-item .rank {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--blue);
+    min-width: 20px;
+    padding-top: 2px;
+  }
+  .priority-item .pri-title {
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .priority-item .pri-note {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* ── Filter bar ───────────────────────────────────────────────── */
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+  .filters input[type="text"] {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 9999px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    padding: 8px 16px;
+    outline: none;
+    width: 240px;
+    transition: border-color .2s;
+  }
+  .filters input[type="text"]:focus { border-color: var(--blue); }
+  .filters input[type="text"]::placeholder { color: var(--muted); }
+  .filters select {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 9999px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    padding: 8px 16px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color .2s;
+  }
+  .filters select:focus { border-color: var(--blue); }
+  .filters label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+  }
+  .filters input[type="checkbox"] { accent-color: var(--blue); width: 15px; height: 15px; cursor: pointer; }
+  .result-count { font-size: 13px; color: var(--muted); margin-left: auto; }
+
+  /* ── Issues table ─────────────────────────────────────────────── */
+  .issues-section { margin-bottom: 48px; }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead th {
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+  tbody tr:hover { background: rgba(32, 125, 233, 0.06); }
+  tbody tr:nth-child(even) { background: rgba(255,255,255,.015); }
+  tbody tr:nth-child(even):hover { background: rgba(32, 125, 233, 0.06); }
+  td { padding: 12px 16px; vertical-align: middle; }
+  td a {
+    color: var(--blue-light);
+    text-decoration: none;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  td a:hover { color: var(--blue); text-decoration: underline; }
+  .summary-cell { max-width: 380px; }
+
+  /* ── Status badge ─────────────────────────────────────────────── */
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    white-space: nowrap;
+  }
+  .badge-todo       { background: rgba(130,157,206,.18); color: #b0c4de; }
+  .badge-inprogress { background: rgba(32,125,233,.2);  color: var(--blue-light); }
+  .badge-review     { background: rgba(77,193,185,.2);  color: var(--teal); }
+  .badge-blocked    { background: rgba(240,77,80,.2);   color: #f88; }
+  .badge-refinement { background: rgba(247,148,29,.15); color: var(--orange); }
+  .badge-default    { background: rgba(130,157,206,.12); color: var(--muted); }
+
+  /* ── Priority icon ────────────────────────────────────────────── */
+  .pri { font-size: 13px; }
+
+  /* ── Epic tag ─────────────────────────────────────────────────── */
+  .epic-tag {
+    display: inline-block;
+    background: rgba(32,125,233,.15);
+    color: var(--blue-light);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ── Empty state ──────────────────────────────────────────────── */
+  .empty {
+    text-align: center;
+    padding: 64px 32px;
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  /* ── Footer ───────────────────────────────────────────────────── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 32px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  footer a { color: var(--blue); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <img src="https://www.webfx.com/wp-content/uploads/2021/11/webfx-light.png"
+         alt="WebFX" class="logo">
+    <div class="divider"></div>
+    <h1><span>AdTechFX</span> Dashboard</h1>
+  </div>
+  <div class="last-updated">Updated: __LAST_UPDATED__</div>
+</header>
+
+<main>
+
+  <!-- Stat cards -->
+  <div class="stats" id="statCards">
+    <div class="stat-card">
+      <div class="num" id="statTotal">—</div>
+      <div class="label">Open Issues</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="statInProgress">—</div>
+      <div class="label">In Progress</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="statReview">—</div>
+      <div class="label">In Review</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="statUnassigned">—</div>
+      <div class="label">Unassigned</div>
+    </div>
+  </div>
+
+  <!-- Upcoming priorities -->
+  <section class="priorities-section">
+    <div class="section-head">
+      <h2>Upcoming Priorities</h2>
+    </div>
+    <div class="priority-list" id="priorityList"></div>
+  </section>
+
+  <!-- Issues table -->
+  <section class="issues-section">
+    <div class="section-head">
+      <h2>All Open Issues</h2>
+      <span class="pill" id="visibleCount">0</span>
+    </div>
+
+    <div class="filters">
+      <input type="text" id="searchInput" placeholder="Search issues…">
+      <select id="statusFilter"><option value="">All statuses</option></select>
+      <select id="assigneeFilter"><option value="">All assignees</option></select>
+      <select id="epicFilter"><option value="">All epics</option></select>
+      <label>
+        <input type="checkbox" id="hideBlocked"> Hide blocked
+      </label>
+      <span class="result-count" id="resultCount"></span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Type</th>
+            <th style="width:100%">Summary</th>
+            <th>Status</th>
+            <th>Assignee</th>
+            <th>Epic</th>
+            <th>Priority</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody id="issueTableBody"></tbody>
+      </table>
+      <div class="empty" id="emptyState" style="display:none">No issues match your filters.</div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>MCPP · AdTechFX · <a href="https://webfx.atlassian.net/jira/software/projects/MCPP/boards" target="_blank">Open Jira Board ↗</a></p>
+</footer>
+
+<script>
+const ISSUES     = __ISSUES_JSON__;
+const PRIORITIES = __PRIORITIES_JSON__;
+
+// ── Priority badge colours ─────────────────────────────────────────────────
+const PRIORITY_ICONS = {
+  Highest: "🔴",
+  High:    "🟠",
+  Medium:  "🟡",
+  Low:     "🔵",
+  Lowest:  "⚪",
+};
+
+// ── Status → badge class ───────────────────────────────────────────────────
+function badgeClass(status) {
+  const s = status.toLowerCase();
+  if (s.includes("progress"))   return "badge-inprogress";
+  if (s.includes("review"))     return "badge-review";
+  if (s.includes("blocked"))    return "badge-blocked";
+  if (s.includes("refinement")) return "badge-refinement";
+  if (s === "to do" || s === "open" || s === "backlog") return "badge-todo";
+  return "badge-default";
+}
+
+// ── Build dropdowns ────────────────────────────────────────────────────────
+function populateSelect(id, values) {
+  const sel = document.getElementById(id);
+  [...new Set(values)].filter(Boolean).sort().forEach(v => {
+    const o = document.createElement("option");
+    o.value = o.textContent = v;
+    sel.appendChild(o);
+  });
+}
+
+populateSelect("statusFilter",   ISSUES.map(i => i.status));
+populateSelect("assigneeFilter", ISSUES.map(i => i.assignee));
+populateSelect("epicFilter",     ISSUES.map(i => i.epic).filter(Boolean));
+
+// ── Stat cards ─────────────────────────────────────────────────────────────
+function updateStats(visible) {
+  document.getElementById("statTotal").textContent      = visible.length;
+  document.getElementById("statInProgress").textContent = visible.filter(i => i.status.toLowerCase().includes("progress")).length;
+  document.getElementById("statReview").textContent     = visible.filter(i => i.status.toLowerCase().includes("review")).length;
+  document.getElementById("statUnassigned").textContent = visible.filter(i => i.assignee === "Unassigned").length;
+}
+
+// ── Render priorities ──────────────────────────────────────────────────────
+const priList = document.getElementById("priorityList");
+if (PRIORITIES.length === 0) {
+  priList.innerHTML = '<p style="color:var(--muted);font-size:13px">No priorities set. Edit <code>priorities.json</code> to add items.</p>';
+} else {
+  PRIORITIES.forEach((p, idx) => {
+    priList.innerHTML += `
+      <div class="priority-item">
+        <span class="rank">#${idx + 1}</span>
+        <div>
+          <div class="pri-title">${p.title}</div>
+          ${p.note ? `<div class="pri-note">${p.note}</div>` : ""}
+        </div>
+      </div>`;
+  });
+}
+
+// ── Render rows ────────────────────────────────────────────────────────────
+function renderRows(data) {
+  const tbody = document.getElementById("issueTableBody");
+  const empty = document.getElementById("emptyState");
+
+  if (data.length === 0) {
+    tbody.innerHTML = "";
+    empty.style.display = "block";
+  } else {
+    empty.style.display = "none";
+    tbody.innerHTML = data.map(i => `
+      <tr data-status="${i.status}" data-assignee="${i.assignee}" data-epic="${i.epic}">
+        <td><a href="${i.url}" target="_blank">${i.key}</a></td>
+        <td style="color:var(--muted);font-size:12px;white-space:nowrap">${i.type}</td>
+        <td class="summary-cell">${escHtml(i.summary)}</td>
+        <td><span class="badge ${badgeClass(i.status)}">${i.status}</span></td>
+        <td style="white-space:nowrap;font-size:13px">${escHtml(i.assignee)}</td>
+        <td>${i.epic ? `<span class="epic-tag" title="${escHtml(i.epic)}">${escHtml(i.epic)}</span>` : ""}</td>
+        <td class="pri">${PRIORITY_ICONS[i.priority] || ""} <span style="font-size:11px;color:var(--muted)">${i.priority}</span></td>
+        <td style="white-space:nowrap;color:var(--muted);font-size:12px">${i.created_display}</td>
+      </tr>`).join("");
+  }
+
+  document.getElementById("visibleCount").textContent = data.length;
+  document.getElementById("resultCount").textContent  = `${data.length} of ${ISSUES.length} issues`;
+  updateStats(data);
+}
+
+function escHtml(s) {
+  return (s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// ── Filter logic ───────────────────────────────────────────────────────────
+function applyFilters() {
+  const q        = document.getElementById("searchInput").value.toLowerCase();
+  const status   = document.getElementById("statusFilter").value;
+  const assignee = document.getElementById("assigneeFilter").value;
+  const epic     = document.getElementById("epicFilter").value;
+  const hideBlk  = document.getElementById("hideBlocked").checked;
+
+  const filtered = ISSUES.filter(i => {
+    if (q && !i.summary.toLowerCase().includes(q) && !i.key.toLowerCase().includes(q)) return false;
+    if (status   && i.status   !== status)   return false;
+    if (assignee && i.assignee !== assignee) return false;
+    if (epic     && i.epic     !== epic)     return false;
+    if (hideBlk  && i.status.toLowerCase().includes("blocked")) return false;
+    return true;
+  });
+
+  renderRows(filtered);
+}
+
+["searchInput","statusFilter","assigneeFilter","epicFilter"].forEach(id =>
+  document.getElementById(id).addEventListener("input", applyFilters));
+document.getElementById("hideBlocked").addEventListener("change", applyFilters);
+
+// Initial render
+renderRows(ISSUES);
+</script>
+</body>
+</html>
+"""
+
+def generate_html(issues, priorities):
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    html = HTML_TEMPLATE
+    html = html.replace("__LAST_UPDATED__",  now)
+    html = html.replace("__ISSUES_JSON__",   json.dumps(issues, ensure_ascii=False))
+    html = html.replace("__PRIORITIES_JSON__", json.dumps(priorities, ensure_ascii=False))
+    return html
+
+
+# ── Main ──────────────────────────────────────────────────────────────────────
+def main():
+    print("Fetching issues from Jira…")
+    raw     = fetch_issues()
+    print(f"  → {len(raw)} issues returned")
+
+    issues     = shape(raw)
+    priorities = load_priorities()
+    print(f"  → {len(priorities)} priorities loaded")
+
+    html = generate_html(issues, priorities)
+
+    out_path = os.path.join(os.path.dirname(__file__), "index.html")
+    with open(out_path, "w", encoding="utf-8") as fh:
+        fh.write(html)
+
+    print(f"Dashboard written to {out_path}")
+
+
+if __name__ == "__main__":
+    main()

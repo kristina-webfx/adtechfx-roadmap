@@ -1,0 +1,10 @@
+[
+  {
+    "title": "Example priority — replace this with your first priority",
+    "note": "Add a short context note here, or remove the note field entirely"
+  },
+  {
+    "title": "Second upcoming priority",
+    "note": "Optional assignee, deadline, or blocking context"
+  }
+]
