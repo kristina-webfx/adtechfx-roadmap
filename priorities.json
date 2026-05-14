@@ -1,42 +1,52 @@
 [
   {
     "title": "Update AdTechFX to use RCFX Impressions",
-    "note": "This update will improve AI's understanding of AdTechFX & bring its attribution more in line with other channels."
+    "note": "This update will improve AI's understanding of AdTechFX & bring its attribution more in line with other channels.",
+    "month": "May 2026"
   },
   {
     "title": "AdTechFX AI Insights",
-    "note": "Highlight specific stats or findings from active campaigns."
+    "note": "Highlight specific stats or findings from active campaigns.",
+    "month": "May 2026"
   }
   {
     "title": "Remy for AdTechFX",
-    "note": "Ensure that Remy gives accurate responses for AdTechFX and is available on AdTechFX Results pages."
+    "note": "Ensure that Remy gives accurate responses for AdTechFX and is available on AdTechFX Results pages.",
+    "month": "May 2026"
   }
   {
     "title": "7-day Attribution Window",
-    "note": "Give AdTechFX attribution if no other paid channel before conversion."
+    "note": "Give AdTechFX attribution if no other paid channel before conversion.",
+    "month": "June 2026"
   }
   {
     "title": "Attribution Activation Toggle",
-    "note": "Prevent AdTechFX attribution from starting before the campaign begins in TTD"
+    "note": "Prevent AdTechFX attribution from starting before the campaign begins in TTD",
+    "month": "August 2026"
   }
   {
     "title": "Exclude customers from ABR/ABM ICP campaigns",
-    "note": "ABR & ABM ICP campaigns send data directly to TTD from PDL, bypassing C360FX & saving clients prospecting credits. We want to start comparing these contacts with client customers & excluding those contacts from campaigns."
+    "note": "ABR & ABM ICP campaigns send data directly to TTD from PDL, bypassing C360FX & saving clients prospecting credits. We want to start comparing these contacts with client customers & excluding those contacts from campaigns.",
+    "month": "August 2026"
   }
   {
     "title": "Limit CRM-Retargeting Attribution Window to match client sales cycles",
-    "note": "AdTechFX should not receive credit if a deal is won well beyond the end of the client's normal sales cycle."
+    "note": "AdTechFX should not receive credit if a deal is won well beyond the end of the client's normal sales cycle.",
+    "month": "August 2026"
   }
   {
     "title": "Changelog",
-    "note": "Update the AdTechFX Settings to be a "changelog" that shows the history of your campaigns via the Archive."
+    "note": "Update the AdTechFX Settings to be a "changelog" that shows the history of your campaigns via the Archive.",
+    "month": "October 2026"
   }
   {
     "title": "ABM Campaign Builder via Spreadsheet Upload",
-    "note": "Add the ability to upload a company spreadsheet to find contacts for my ABM Campaign."
+    "note": "Add the ability to upload a company spreadsheet to find contacts for my ABM Campaign.",
+    "month": "October 2026"
   }
   {
     "title": "Inventory Performance Reporting",
-    "note": "Show the "Top Ad Placements" in the RCFX UI for each campaign/campaign type. Include logos and the total number of impressions for each platform"
+    "note": "Show the "Top Ad Placements" in the RCFX UI for each campaign/campaign type. Include logos and the total number of impressions for each platform",
+    "month": "Backlog"
   }
 ]
