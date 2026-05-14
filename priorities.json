@@ -20,6 +20,16 @@
     "month": "June 2026"
   },
   {
+    "title": "Inventory Performance Reporting",
+    "note": "Show the Top Ad Placements in the RCFX UI for each campaign/campaign type. Include logos and the total number of impressions for each platform",
+    "month": "Backlog"
+  },
+  {
+    "title": "Active Campaign Overview Page",
+    "note": "Overview of your active campaigns, campaign goals, and KPIs",
+    "month": "Backlog"
+  },
+  {
     "title": "Attribution Activation Toggle",
     "note": "Prevent AdTechFX attribution from starting before the campaign begins in TTD",
     "month": "August 2026"
@@ -43,10 +53,5 @@
     "title": "ABM Campaign Builder via Spreadsheet Upload",
     "note": "Add the ability to upload a company spreadsheet to find contacts for my ABM Campaign.",
     "month": "October 2026"
-  },
-  {
-    "title": "Inventory Performance Reporting",
-    "note": "Show the Top Ad Placements in the RCFX UI for each campaign/campaign type. Include logos and the total number of impressions for each platform",
-    "month": "Backlog"
   }
 ]
