@@ -583,10 +583,11 @@ if (PRIORITIES.length === 0) {
     priList.innerHTML += `
       <div class="priority-item">
         <span class="rank">#${idx + 1}</span>
-        <div>
+        <div style="flex:1">
           <div class="pri-title">${p.title}</div>
           ${p.note ? `<div class="pri-note">${p.note}</div>` : ""}
         </div>
+        ${p.month ? `<span class="badge badge-todo" style="margin-left:auto;white-space:nowrap">${p.month}</span>` : ""}
       </div>`;
   });
 }
