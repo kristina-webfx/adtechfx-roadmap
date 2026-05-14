@@ -7,7 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap">
 <style>
+  /* ── Reset & base ─────────────────────────────────────────────── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
   :root {
     --bg:        #0E1623;
     --surface:   #142034;
@@ -24,57 +26,274 @@
     --orange:    #F7941D;
     --teal:      #4DC1B9;
   }
-  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 15px; line-height: 1.6; }
-  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 24px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
-  header .brand { display: flex; align-items: center; gap: 16px; }
-  header .divider { width: 1px; height: 32px; background: var(--border); }
-  header h1 { font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── Header ───────────────────────────────────────────────────── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  header .brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  header img.logo {
+    height: 32px;
+    display: block;
+  }
+  header .divider {
+    width: 1px;
+    height: 32px;
+    background: var(--border);
+  }
+  header h1 {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
   header h1 span { color: var(--blue); }
-  .last-updated { font-size: 12px; color: var(--muted); font-weight: 600; }
+  .last-updated {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  /* ── Layout ───────────────────────────────────────────────────── */
   main { padding: 32px; max-width: 1400px; margin: 0 auto; }
-  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 32px; }
-  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; }
-  .stat-card .num { font-size: 36px; font-weight: 800; color: var(--blue-light); letter-spacing: -1px; line-height: 1; margin-bottom: 6px; }
-  .stat-card .label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-  .section-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-  .section-head h2 { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; }
-  .section-head .pill { background: var(--blue); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 9999px; }
+
+  /* ── Stat cards ───────────────────────────────────────────────── */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+  .stat-card .num {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--blue-light);
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-card .label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Section heads ────────────────────────────────────────────── */
+  .section-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .section-head h2 {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+  .section-head .pill {
+    background: var(--blue);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 9999px;
+  }
+
+  /* ── Priorities ───────────────────────────────────────────────── */
   .priorities-section { margin-bottom: 40px; }
-  .priority-list { display: flex; flex-direction: column; gap: 8px; }
-  .priority-item { background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--blue); border-radius: 8px; padding: 14px 20px; display: flex; align-items: flex-start; gap: 16px; }
-  .priority-item .rank { font-size: 11px; font-weight: 800; color: var(--blue); min-width: 20px; padding-top: 2px; }
-  .priority-item .pri-title { font-weight: 600; font-size: 14px; }
-  .priority-item .pri-note { font-size: 13px; color: var(--muted); margin-top: 2px; }
-  .filters { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; align-items: center; }
-  .filters input[type="text"] { background: var(--card); border: 1px solid var(--border); border-radius: 9999px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; padding: 8px 16px; outline: none; width: 240px; transition: border-color .2s; }
+  .priority-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .priority-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--blue);
+    border-radius: 8px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .priority-item .rank {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--blue);
+    min-width: 20px;
+    padding-top: 2px;
+  }
+  .priority-item .pri-title {
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .priority-item .pri-note {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* ── Filter bar ───────────────────────────────────────────────── */
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+  .filters input[type="text"] {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 9999px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    padding: 8px 16px;
+    outline: none;
+    width: 240px;
+    transition: border-color .2s;
+  }
   .filters input[type="text"]:focus { border-color: var(--blue); }
   .filters input[type="text"]::placeholder { color: var(--muted); }
-  .filters select { background: var(--card); border: 1px solid var(--border); border-radius: 9999px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; padding: 8px 16px; outline: none; cursor: pointer; }
-  .filters label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); cursor: pointer; user-select: none; }
+  .filters select {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 9999px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    padding: 8px 16px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color .2s;
+  }
+  .filters select:focus { border-color: var(--blue); }
+  .filters label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+  }
   .filters input[type="checkbox"] { accent-color: var(--blue); width: 15px; height: 15px; cursor: pointer; }
   .result-count { font-size: 13px; color: var(--muted); margin-left: auto; }
+
+  /* ── Issues table ─────────────────────────────────────────────── */
   .issues-section { margin-bottom: 48px; }
   .table-wrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  thead th { background: var(--surface); color: var(--muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead th {
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
   tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
   tbody tr:hover { background: rgba(32, 125, 233, 0.06); }
   tbody tr:nth-child(even) { background: rgba(255,255,255,.015); }
   tbody tr:nth-child(even):hover { background: rgba(32, 125, 233, 0.06); }
   td { padding: 12px 16px; vertical-align: middle; }
-  td a { color: var(--blue-light); text-decoration: none; font-weight: 600; font-family: monospace; font-size: 12px; white-space: nowrap; }
+  td a {
+    color: var(--blue-light);
+    text-decoration: none;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    white-space: nowrap;
+  }
   td a:hover { color: var(--blue); text-decoration: underline; }
   .summary-cell { max-width: 380px; }
-  .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 9999px; white-space: nowrap; }
+
+  /* ── Status badge ─────────────────────────────────────────────── */
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    white-space: nowrap;
+  }
   .badge-todo       { background: rgba(130,157,206,.18); color: #b0c4de; }
   .badge-inprogress { background: rgba(32,125,233,.2);  color: var(--blue-light); }
   .badge-review     { background: rgba(77,193,185,.2);  color: var(--teal); }
   .badge-blocked    { background: rgba(240,77,80,.2);   color: #f88; }
   .badge-refinement { background: rgba(247,148,29,.15); color: var(--orange); }
   .badge-default    { background: rgba(130,157,206,.12); color: var(--muted); }
-  .epic-tag { display: inline-block; background: rgba(32,125,233,.15); color: var(--blue-light); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .empty { text-align: center; padding: 64px 32px; color: var(--muted); font-size: 15px; }
-  footer { border-top: 1px solid var(--border); padding: 24px 32px; text-align: center; font-size: 12px; color: var(--muted); }
+
+  /* ── Priority icon ────────────────────────────────────────────── */
+  .pri { font-size: 13px; }
+
+  /* ── Epic tag ─────────────────────────────────────────────────── */
+  .epic-tag {
+    display: inline-block;
+    background: rgba(32,125,233,.15);
+    color: var(--blue-light);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ── Empty state ──────────────────────────────────────────────── */
+  .empty {
+    text-align: center;
+    padding: 64px 32px;
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  /* ── Footer ───────────────────────────────────────────────────── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 32px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+  }
   footer a { color: var(--blue); text-decoration: none; }
 </style>
 </head>
@@ -82,45 +301,74 @@
 
 <header>
   <div class="brand">
-    <img src="https://www.webfx.com/wp-content/uploads/2021/11/webfx-light.png" alt="WebFX" height="32" style="display:block">
+    <img src="https://www.webfx.com/wp-content/uploads/2021/11/webfx-light.png"
+         alt="WebFX" class="logo">
     <div class="divider"></div>
     <h1><span>AdTechFX</span> Dashboard</h1>
   </div>
-  <div class="last-updated">Updated: 2026-05-14 12:00 UTC</div>
+  <div class="last-updated">Updated: 2026-05-14 16:02 UTC</div>
 </header>
 
 <main>
-  <div class="stats">
-    <div class="stat-card"><div class="num" id="statTotal">—</div><div class="label">Open Issues</div></div>
-    <div class="stat-card"><div class="num" id="statInProgress">—</div><div class="label">In Progress</div></div>
-    <div class="stat-card"><div class="num" id="statReview">—</div><div class="label">In Review</div></div>
-    <div class="stat-card"><div class="num" id="statUnassigned">—</div><div class="label">Unassigned</div></div>
+
+  <!-- Stat cards -->
+  <div class="stats" id="statCards">
+    <div class="stat-card">
+      <div class="num" id="statTotal">—</div>
+      <div class="label">Open Issues</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="statInProgress">—</div>
+      <div class="label">In Progress</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="statReview">—</div>
+      <div class="label">In Review</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="statUnassigned">—</div>
+      <div class="label">Unassigned</div>
+    </div>
   </div>
 
+  <!-- Upcoming priorities -->
   <section class="priorities-section">
-    <div class="section-head"><h2>Upcoming Priorities</h2></div>
+    <div class="section-head">
+      <h2>Upcoming Priorities</h2>
+    </div>
     <div class="priority-list" id="priorityList"></div>
   </section>
 
+  <!-- Issues table -->
   <section class="issues-section">
     <div class="section-head">
       <h2>All Open Issues</h2>
       <span class="pill" id="visibleCount">0</span>
     </div>
+
     <div class="filters">
       <input type="text" id="searchInput" placeholder="Search issues…">
       <select id="statusFilter"><option value="">All statuses</option></select>
       <select id="assigneeFilter"><option value="">All assignees</option></select>
       <select id="epicFilter"><option value="">All epics</option></select>
-      <label><input type="checkbox" id="hideBlocked"> Hide blocked</label>
+      <label>
+        <input type="checkbox" id="hideBlocked"> Hide blocked
+      </label>
       <span class="result-count" id="resultCount"></span>
     </div>
+
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
-            <th>Key</th><th>Type</th><th style="width:100%">Summary</th><th>Status</th>
-            <th>Assignee</th><th>Epic</th><th>Priority</th><th>Created</th>
+            <th>Key</th>
+            <th>Type</th>
+            <th style="width:100%">Summary</th>
+            <th>Status</th>
+            <th>Assignee</th>
+            <th>Epic</th>
+            <th>Priority</th>
+            <th>Created</th>
           </tr>
         </thead>
         <tbody id="issueTableBody"></tbody>
@@ -128,6 +376,7 @@
       <div class="empty" id="emptyState" style="display:none">No issues match your filters.</div>
     </div>
   </section>
+
 </main>
 
 <footer>
@@ -135,48 +384,44 @@
 </footer>
 
 <script>
-// Sample data (replaced by generate_dashboard.py in production)
-const ISSUES = [
-  {"key":"MCPP-9320","url":"https://webfx.atlassian.net/browse/MCPP-9320","summary":"Modernize AdTechFX attribution pipeline to support GA4 event schema","status":"In Progress","assignee":"Daniel Stebbins","priority":"High","type":"Story","epic":"AdTechFX Attribution Modernization","sprint":"Sprint 42","created":"2026-05-10T14:23:00.000Z","created_display":"2026-05-10","labels":["AdTechFX"]},
-  {"key":"MCPP-9315","url":"https://webfx.atlassian.net/browse/MCPP-9315","summary":"TTD conversion row count discrepancy investigation","status":"In Progress","assignee":"Justin Karli","priority":"High","type":"Bug","epic":"AdTechFX Attribution Modernization","sprint":"Sprint 42","created":"2026-05-09T09:11:00.000Z","created_display":"2026-05-09","labels":["AdTechFX"]},
-  {"key":"MCPP-9308","url":"https://webfx.atlassian.net/browse/MCPP-9308","summary":"IP list sync: handle inactive campaign edge case in TTD file format","status":"In Review","assignee":"Kamal Muradov","priority":"Medium","type":"Task","epic":"AdTechFX Attribution Modernization","sprint":"Sprint 42","created":"2026-05-07T16:45:00.000Z","created_display":"2026-05-07","labels":["AdTechFX"]},
-  {"key":"MCPP-9290","url":"https://webfx.atlassian.net/browse/MCPP-9290","summary":"Build Looker view for Google Ads conversion upload summary","status":"In Review","assignee":"Connor Clifford","priority":"Medium","type":"Story","epic":"Reporting & Analytics","sprint":"Sprint 42","created":"2026-05-05T10:00:00.000Z","created_display":"2026-05-05","labels":["AdTechFX"]},
-  {"key":"MCPP-9274","url":"https://webfx.atlassian.net/browse/MCPP-9274","summary":"Product logo inconsistency in AdTechFX campaign card header","status":"To Do","assignee":"Unassigned","priority":"Low","type":"Bug","epic":"UI Bugs","sprint":"Sprint 43","created":"2026-05-02T08:30:00.000Z","created_display":"2026-05-02","labels":["AdTechFX"]},
-  {"key":"MCPP-9265","url":"https://webfx.atlassian.net/browse/MCPP-9265","summary":"API key lifecycle automation — deactivate on user offboard","status":"To Do","assignee":"Unassigned","priority":"High","type":"Story","epic":"Security & Compliance","sprint":"Sprint 43","created":"2026-04-30T14:00:00.000Z","created_display":"2026-04-30","labels":["AdTechFX"]},
-  {"key":"MCPP-9241","url":"https://webfx.atlassian.net/browse/MCPP-9241","summary":"Refactor identity-audience-expire service to emit deletion events","status":"Blocked","assignee":"Daniel Stebbins","priority":"Highest","type":"Story","epic":"AdTechFX Attribution Modernization","sprint":"Sprint 41","created":"2026-04-25T11:22:00.000Z","created_display":"2026-04-25","labels":["AdTechFX"]},
-  {"key":"MCPP-9198","url":"https://webfx.atlassian.net/browse/MCPP-9198","summary":"AdTechFX Guru card update — document active vs received ID mechanics","status":"To Do","assignee":"Unassigned","priority":"Low","type":"Task","epic":"Documentation","sprint":"","created":"2026-04-18T09:00:00.000Z","created_display":"2026-04-18","labels":["AdTechFX"]},
-  {"key":"MCPP-9041","url":"https://webfx.atlassian.net/browse/MCPP-9041","summary":"Validate TTD active ID count against received count in pipeline","status":"In Progress","assignee":"Justin Karli","priority":"Medium","type":"Task","epic":"AdTechFX Attribution Modernization","sprint":"Sprint 42","created":"2026-04-10T13:15:00.000Z","created_display":"2026-04-10","labels":["AdTechFX"]},
-  {"key":"MCPP-8932","url":"https://webfx.atlassian.net/browse/MCPP-8932","summary":"Harden campaign-check microservice: rotate hardcoded API key","status":"In Review","assignee":"Connor Clifford","priority":"Highest","type":"Bug","epic":"Security & Compliance","sprint":"Sprint 42","created":"2026-03-28T10:00:00.000Z","created_display":"2026-03-28","labels":["AdTechFX"]},
-];
+const ISSUES     = [{"key": "MCPP-5288", "url": "https://webfx.atlassian.net/browse/MCPP-5288", "summary": "AdTechFX: Inventory Performance Report", "status": "Refinement", "assignee": "Kristina Pollard", "priority": "Medium", "type": "Story", "epic": "AdTechFX: Inventory Performance ", "sprint": "", "created": "2024-12-19T16:59:32.043-0500", "created_display": "2024-12-19", "labels": ["AdTechFX"]}];
+const PRIORITIES = [{"title": "Example priority — replace this with your first priority", "note": "Add a short context note here, or remove the note field entirely"}, {"title": "Second upcoming priority", "note": "Optional assignee, deadline, or blocking context"}];
 
-const PRIORITIES = [
-  {"title":"MCPP-9241 — identity-audience-expire deletion events (blocked on infra access)", "note":"Daniel is the lead; unblock by EOW"},
-  {"title":"MCPP-9265 — API key lifecycle automation for offboarding", "note":"Security ask from compliance review"},
-  {"title":"MCPP-9320 — GA4 attribution pipeline modernization", "note":"Target demo in Sprint 43 review"},
-];
+// ── Priority badge colours ─────────────────────────────────────────────────
+const PRIORITY_ICONS = {
+  Highest: "🔴",
+  High:    "🟠",
+  Medium:  "🟡",
+  Low:     "🔵",
+  Lowest:  "⚪",
+};
 
-const PRIORITY_ICONS = { Highest:"🔴", High:"🟠", Medium:"🟡", Low:"🔵", Lowest:"⚪" };
-
-function badgeClass(s) {
-  const l = s.toLowerCase();
-  if (l.includes("progress"))   return "badge-inprogress";
-  if (l.includes("review"))     return "badge-review";
-  if (l.includes("blocked"))    return "badge-blocked";
-  if (l.includes("refinement")) return "badge-refinement";
-  if (l === "to do" || l === "open" || l === "backlog") return "badge-todo";
+// ── Status → badge class ───────────────────────────────────────────────────
+function badgeClass(status) {
+  const s = status.toLowerCase();
+  if (s.includes("progress"))   return "badge-inprogress";
+  if (s.includes("review"))     return "badge-review";
+  if (s.includes("blocked"))    return "badge-blocked";
+  if (s.includes("refinement")) return "badge-refinement";
+  if (s === "to do" || s === "open" || s === "backlog") return "badge-todo";
   return "badge-default";
 }
 
+// ── Build dropdowns ────────────────────────────────────────────────────────
 function populateSelect(id, values) {
   const sel = document.getElementById(id);
   [...new Set(values)].filter(Boolean).sort().forEach(v => {
-    const o = document.createElement("option"); o.value = o.textContent = v; sel.appendChild(o);
+    const o = document.createElement("option");
+    o.value = o.textContent = v;
+    sel.appendChild(o);
   });
 }
+
 populateSelect("statusFilter",   ISSUES.map(i => i.status));
 populateSelect("assigneeFilter", ISSUES.map(i => i.assignee));
 populateSelect("epicFilter",     ISSUES.map(i => i.epic).filter(Boolean));
 
+// ── Stat cards ─────────────────────────────────────────────────────────────
 function updateStats(visible) {
   document.getElementById("statTotal").textContent      = visible.length;
   document.getElementById("statInProgress").textContent = visible.filter(i => i.status.toLowerCase().includes("progress")).length;
@@ -184,54 +429,80 @@ function updateStats(visible) {
   document.getElementById("statUnassigned").textContent = visible.filter(i => i.assignee === "Unassigned").length;
 }
 
+// ── Render priorities ──────────────────────────────────────────────────────
 const priList = document.getElementById("priorityList");
-PRIORITIES.forEach((p, idx) => {
-  priList.innerHTML += `<div class="priority-item"><span class="rank">#${idx+1}</span><div><div class="pri-title">${p.title}</div>${p.note?`<div class="pri-note">${p.note}</div>`:""}</div></div>`;
-});
+if (PRIORITIES.length === 0) {
+  priList.innerHTML = '<p style="color:var(--muted);font-size:13px">No priorities set. Edit <code>priorities.json</code> to add items.</p>';
+} else {
+  PRIORITIES.forEach((p, idx) => {
+    priList.innerHTML += `
+      <div class="priority-item">
+        <span class="rank">#${idx + 1}</span>
+        <div>
+          <div class="pri-title">${p.title}</div>
+          ${p.note ? `<div class="pri-note">${p.note}</div>` : ""}
+        </div>
+      </div>`;
+  });
+}
 
-function escHtml(s) { return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
-
+// ── Render rows ────────────────────────────────────────────────────────────
 function renderRows(data) {
   const tbody = document.getElementById("issueTableBody");
   const empty = document.getElementById("emptyState");
-  if (!data.length) { tbody.innerHTML = ""; empty.style.display = "block"; }
-  else {
+
+  if (data.length === 0) {
+    tbody.innerHTML = "";
+    empty.style.display = "block";
+  } else {
     empty.style.display = "none";
     tbody.innerHTML = data.map(i => `
-      <tr>
+      <tr data-status="${i.status}" data-assignee="${i.assignee}" data-epic="${i.epic}">
         <td><a href="${i.url}" target="_blank">${i.key}</a></td>
         <td style="color:var(--muted);font-size:12px;white-space:nowrap">${i.type}</td>
         <td class="summary-cell">${escHtml(i.summary)}</td>
         <td><span class="badge ${badgeClass(i.status)}">${i.status}</span></td>
         <td style="white-space:nowrap;font-size:13px">${escHtml(i.assignee)}</td>
-        <td>${i.epic?`<span class="epic-tag" title="${escHtml(i.epic)}">${escHtml(i.epic)}</span>`:""}</td>
-        <td>${PRIORITY_ICONS[i.priority]||""} <span style="font-size:11px;color:var(--muted)">${i.priority}</span></td>
+        <td>${i.epic ? `<span class="epic-tag" title="${escHtml(i.epic)}">${escHtml(i.epic)}</span>` : ""}</td>
+        <td class="pri">${PRIORITY_ICONS[i.priority] || ""} <span style="font-size:11px;color:var(--muted)">${i.priority}</span></td>
         <td style="white-space:nowrap;color:var(--muted);font-size:12px">${i.created_display}</td>
       </tr>`).join("");
   }
+
   document.getElementById("visibleCount").textContent = data.length;
   document.getElementById("resultCount").textContent  = `${data.length} of ${ISSUES.length} issues`;
   updateStats(data);
 }
 
+function escHtml(s) {
+  return (s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// ── Filter logic ───────────────────────────────────────────────────────────
 function applyFilters() {
   const q        = document.getElementById("searchInput").value.toLowerCase();
   const status   = document.getElementById("statusFilter").value;
   const assignee = document.getElementById("assigneeFilter").value;
   const epic     = document.getElementById("epicFilter").value;
   const hideBlk  = document.getElementById("hideBlocked").checked;
-  renderRows(ISSUES.filter(i => {
+
+  const filtered = ISSUES.filter(i => {
     if (q && !i.summary.toLowerCase().includes(q) && !i.key.toLowerCase().includes(q)) return false;
     if (status   && i.status   !== status)   return false;
     if (assignee && i.assignee !== assignee) return false;
     if (epic     && i.epic     !== epic)     return false;
     if (hideBlk  && i.status.toLowerCase().includes("blocked")) return false;
     return true;
-  }));
+  });
+
+  renderRows(filtered);
 }
+
 ["searchInput","statusFilter","assigneeFilter","epicFilter"].forEach(id =>
   document.getElementById(id).addEventListener("input", applyFilters));
 document.getElementById("hideBlocked").addEventListener("change", applyFilters);
+
+// Initial render
 renderRows(ISSUES);
 </script>
 </body>
