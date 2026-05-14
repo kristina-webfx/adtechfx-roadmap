@@ -49,21 +49,20 @@ def fetch_issues():
     )
 
     issues = []
-    start_at = 0
-    page_size = 100
+    next_page_token = None
 
     while True:
-        payload = json.dumps({
+        payload = {
             "jql":        jql,
-            "startAt":    start_at,
-            "maxResults": page_size,
-            "fieldsByKeys": False,
+            "maxResults": 100,
             "fields":     FIELDS,
-        }).encode()
+        }
+        if next_page_token:
+            payload["nextPageToken"] = next_page_token
 
         req = urllib.request.Request(
             f"{JIRA_BASE}/rest/api/3/search/jql",
-            data=payload,
+            data=json.dumps(payload).encode(),
             headers=_auth_header(),
             method="POST",
         )
@@ -76,9 +75,8 @@ def fetch_issues():
             sys.exit(1)
 
         issues.extend(data.get("issues", []))
-        total = data.get("total", 0)
-        start_at += page_size
-        if start_at >= total:
+        next_page_token = data.get("nextPageToken")
+        if not next_page_token:
             break
 
     return issues
