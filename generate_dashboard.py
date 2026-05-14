@@ -61,7 +61,7 @@ def fetch_issues():
         }).encode()
 
         req = urllib.request.Request(
-            f"{JIRA_BASE}/rest/api/3/search/jql",
+            f"{JIRA_BASE}/rest/api/3/search",
             data=payload,
             headers=_auth_header(),
             method="POST",
