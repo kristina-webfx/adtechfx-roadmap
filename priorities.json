@@ -1,33 +1,33 @@
 [
   {
-    "title": "Update AdTechFX to use RCFX Impressions",
+    "title": "Launched - Update AdTechFX to use RCFX Impressions",
     "note": "This update will improve AI's understanding of AdTechFX & bring its attribution more in line with other channels.",
     "month": "May 2026"
   },
   {
     "title": "AdTechFX AI Insights",
     "note": "Highlight specific stats or findings from active campaigns.",
-    "month": "May 2026"
+    "month": "June 2026"
   },
   {
     "title": "Remy for AdTechFX",
     "note": "Ensure that Remy gives accurate responses for AdTechFX and is available on AdTechFX Results pages.",
-    "month": "May 2026"
+    "month": "June 2026"
   },
   {
     "title": "7-day Attribution Window",
     "note": "Give AdTechFX attribution if no other paid channel before conversion.",
-    "month": "June 2026"
+    "month": "July 2026"
   },
   {
     "title": "Inventory Performance Reporting",
     "note": "Show the Top Ad Placements in the RCFX UI for each campaign/campaign type. Include logos and the total number of impressions for each platform",
-    "month": "Backlog"
+    "month": "July 2026"
   },
   {
     "title": "Active Campaign Overview Page",
     "note": "Overview of your active campaigns, campaign goals, and KPIs",
-    "month": "Backlog"
+    "month": "July 2026"
   },
   {
     "title": "Attribution Activation Toggle",
@@ -47,7 +47,7 @@
   {
     "title": "Changelog",
     "note": "Update the AdTechFX Settings to be a changelog that shows the history of your campaigns via the Archive.",
-    "month": "October 2026"
+    "month": "August 2026"
   },
   {
     "title": "ABM Campaign Builder via Spreadsheet Upload",
