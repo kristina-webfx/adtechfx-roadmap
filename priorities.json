@@ -22,16 +22,11 @@
   {
     "title": "Inventory Performance Reporting",
     "note": "Show the Top Ad Placements in the RCFX UI for each campaign/campaign type. Include logos and the total number of impressions for each platform",
-    "month": "July 2026"
+    "month": "July/August 2026"
   },
   {
     "title": "Active Campaign Overview Page",
     "note": "Overview of your active campaigns, campaign goals, and KPIs",
-    "month": "July 2026"
-  },
-  {
-    "title": "Attribution Activation Toggle",
-    "note": "Prevent AdTechFX attribution from starting before the campaign begins in TTD",
     "month": "August 2026"
   },
   {
@@ -40,14 +35,19 @@
     "month": "August 2026"
   },
   {
-    "title": "Limit CRM-Retargeting Attribution Window to match client sales cycles",
-    "note": "AdTechFX should not receive credit if a deal is won well beyond the end of the client's normal sales cycle.",
-    "month": "August 2026"
-  },
-  {
     "title": "Changelog",
     "note": "Update the AdTechFX Settings to be a changelog that shows the history of your campaigns via the Archive.",
     "month": "August 2026"
+  },
+  {
+    "title": "Limit CRM-Retargeting Attribution Window to match client sales cycles",
+    "note": "AdTechFX should not receive credit if a deal is won well beyond the end of the client's normal sales cycle.",
+    "month": "September 2026"
+  },
+  {
+    "title": "Attribution Activation Toggle",
+    "note": "Prevent AdTechFX attribution from starting before the campaign begins in TTD",
+    "month": "September 2026"
   },
   {
     "title": "ABM Campaign Builder via Spreadsheet Upload",
